@@ -2,84 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ShopStoreRequest;
+use App\Http\Requests\ShopUpdateRequest;
+use App\Http\Resources\ShopShopAllResource;
+use App\Http\Resources\ShopShopSingleResource;
 use App\Models\Shop;
-use Illuminate\Http\Request;
+use App\Services\ShopService;
 
-class ShopController extends Controller
+class ShopController extends ResponseController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return ShopShopAllResource
      */
-    public function index()
+    public function index(): ShopShopAllResource
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return $this->success(new ShopShopAllResource(Shop::whereStatus(1)->paginate(15)));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param ShopStoreRequest $request
+     * @return ShopShopSingleResource
      */
-    public function store(Request $request)
+    public function store(ShopStoreRequest $request): ShopShopSingleResource
     {
-        //
+        return $this->success(new ShopShopSingleResource((new ShopService())->add($request->all())));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Shop  $shop
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return ShopShopSingleResource
      */
-    public function show(Shop $shop)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Shop  $shop
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Shop $shop)
-    {
-        //
+        return $this->success(new ShopShopSingleResource(Shop::find($id)));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Shop  $shop
+     * @param ShopUpdateRequest $request
+     * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Shop $shop)
+    public function update(ShopUpdateRequest $request, $id)
     {
-        //
+        return $this->success(new ShopShopSingleResource((new ShopService())->edit($request->all(), $id)));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Shop  $shop
+     * @param $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Shop $shop)
+    public function destroy($id)
     {
-        //
+        Shop::find($id)->delete();
+        return $this->success();
     }
 }
